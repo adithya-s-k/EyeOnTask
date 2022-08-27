@@ -14,6 +14,8 @@ from keras.models import load_model
 import time
 from playsound import playsound
 import os
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import LeakyReLU
 
 
 app=Flask(__name__)
@@ -99,6 +101,72 @@ def generate_frames():
                 break
     camera.release()
     cv2.destroyAllWindows()
+    
+def detection():
+    time.sleep(2)
+    cap = cv2.VideoCapture('./static/assets/Countdown5.mp4')
+    while(cap.isOpened()):
+    # Capture frame-by-frame
+        ret, res1 = cap.read()
+        if ret == True:
+            _,buffer=cv2.imencode(".jpg",res1)
+            res1=buffer.tobytes()
+            yield(b' --frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n'+res1+b'\r\n')
+        else: 
+            break
+    cap.release()
+    cv2.destroyAllWindows()  
+    labels = np.load('labels.npy')
+    model = load_model('model.h5')
+    cap = cv2.VideoCapture(1)
+    holis = mp.solutions.holistic
+    hands = mp.solutions.hands
+    drawing = mp.solutions.drawing_utils 
+    holisO = holis.Holistic(static_image_mode=False)
+    while True:
+        x = []
+        stime = time.time()
+        ret, frame = cap.read()
+        frame = cv2.flip(frame, 1)
+        res = holisO.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+        drawing.draw_landmarks(frame, res.left_hand_landmarks, hands.HAND_CONNECTIONS)
+        drawing.draw_landmarks(frame, res.right_hand_landmarks, hands.HAND_CONNECTIONS)
+        # drawing.draw_landmarks(frame, res.face_landmarks, holis.FACEMESH_CONTOURS)
+        if res.face_landmarks:
+            if not(res.left_hand_landmarks):
+                for i in range(42):
+                    x.append(0.0)
+            else:
+                lox, loy = res.left_hand_landmarks.landmark[8].x, res.left_hand_landmarks.landmark[8].y
+                for i in res.left_hand_landmarks.landmark:
+                    x.append(i.x - lox)
+                    x.append(i.y - loy)
+            if not(res.right_hand_landmarks):
+                
+                for i in range(42):
+                    x.append(0.0)
+            else:
+                rox, roy = res.right_hand_landmarks.landmark[8].x, res.right_hand_landmarks.landmark[8].y
+                for i in res.right_hand_landmarks.landmark:
+                    x.append(i.x - rox)
+                    x.append(i.y - roy)
+            for i in res.face_landmarks.landmark:
+                x.append(i.x - res.face_landmarks.landmark[1].x)
+                x.append(i.y - res.face_landmarks.landmark[1].y)
+            pred = model.predict(np.array([x]))
+            cv2.putText(frame, labels[np.argmax(pred)], (50,100), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,225,0), 7)
+            
+        etime = time.time()
+        cv2.putText(frame, f"{int(1/(etime-stime))}", (50,340), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+        
+        _,buffer=cv2.imencode(".jpg",frame)
+        frame=buffer.tobytes()
+        yield(b' --frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n'+frame+b'\r\n')
+        
+        
+
 
 @app.route('/')
 def index():
@@ -106,7 +174,7 @@ def index():
 
 @app.route('/video')
 def video():
-    return Response(generate_frames(),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(detection(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == "__main__":

@@ -1,0 +1,33 @@
+*{
+    margin: 0;
+    padding: 0;
+    background-color: #313639;
+    
+}
+
+.Container{
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    display: flex;
+    height: 100vh;
+}
+
+.left{
+    width: 70vw;
+    padding-right: 10px;
+}
+
+.right{
+    width: 25vw;
+}
+
+.text{
+    margin-top: 10px;
+    width: 25vw;
+    height: 100%;
+    border-radius: 10px;
+    background: #414547;
+    box-shadow:  20px 20px 60px #2a2e30,-20px -20px 60px #383e42;
+}

@@ -4,15 +4,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="stylesheet" href="{{  url_for('static',filename='css/style.css')  }}">
+
+
     <title>{%block title%}{%endblock%}</title>
     {%block head1%}{%endblock%}
 </head>
   <body>
-        <h1>Hello World</h1>
-        <div>
-            <img src="{{ url_for('video') }}" width="50%"/>
+        <div class="Container">
+            <div class="left">
+                <embed class="pdf" src="{{  url_for('static',filename='first.pdf')  }}" width="100%" height="720px" />
+            </div>
+            <div class="right">
+                <div class="video" style="margin-top: 10px;">
+                    <img src="{{ url_for('video') }}" width="100%"/>
+                </div>
+                <div class="text">
+                    <textarea style="border: none;
+                    background-color: transparent;
+                    color:white;
+                    font-size:10px;
+                    padding:10px;
+                    outline:none;" cols="40" rows="200">Take your notes</textarea>
+                </div>
+            </div>
         </div>
-    </div>
     {%block body%} 
     {%endblock%}
 </body>
