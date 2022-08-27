@@ -1,6 +1,5 @@
 import secrets
 from flask import Flask,render_template,redirect,request,Response,session
-import pyrebase
 import cv2
 import requests
 import json
@@ -12,13 +11,31 @@ mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
 from keras.models import load_model 
 import time
-from playsound import playsound
 import os
-from tensorflow.keras.models import load_model
-from tensorflow.keras.layers import LeakyReLU
-
+from keras.models import load_model
+from keras.layers import LeakyReLU
+from matplotlib import pyplot as plt
 
 app=Flask(__name__)
+
+timing = []
+list_State = []
+state = "screen"
+prevState = "look away"
+begin = 0
+end = 0
+
+def start(): 
+    global begin
+    begin=time.time()
+
+def ending():
+    global end
+    end=time.time()
+    global elapsed
+    elapsed=end-begin
+    elapsed=int(elapsed)
+    timing.append(int(elapsed))
 
 def calculate_angle(a,b,c):#shoulder, elbow, wrist
     a = np.array(a) # First
@@ -51,10 +68,8 @@ def calculate_distance(a,b):
     #distance = ((((b[0] - a[0])**(2)) - ((b[1] - a[1])**(2)))**(0.5))
     distance = math.hypot(b[0] - a[0], b[1] - a[1])
 
-
-
-def generate_frames():
-    time.sleep(2)
+    
+def timer():
     cap = cv2.VideoCapture('./static/assets/Countdown5.mp4')
     while(cap.isOpened()):
     # Capture frame-by-frame
@@ -67,42 +82,18 @@ def generate_frames():
         else: 
             break
     cap.release()
-    cv2.destroyAllWindows()    
-    camera=cv2.VideoCapture(1)
-    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
-        while camera.isOpened():
-            ## read the camera frame
-            ret,frame=camera.read()
-            image1 = frame
-            if not ret:
-                break
-            else:
-                image1 = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) #converting BGR to RGB so that it becomes easier for library to read the image1
-                image1.flags.writeable = False #this step is done to save some memoery
-                # Make detection
-                results = pose.process(image1) #We are using the pose estimation model 
-                # Recolor back to BGR
-                image1.flags.writeable = True
-                image1 = cv2.cvtColor(image1, cv2.COLOR_RGB2BGR)
-                # Extract landmarks
-                try:
-                    landmarks = results.pose_landmarks.landmark                    
-                except:
-                    pass
-                mp_drawing.draw_landmarks(image1, results.pose_landmarks, mp_pose.POSE_CONNECTIONS,
-                                        mp_drawing.DrawingSpec(color=(245,117,66), thickness=2, circle_radius=2), 
-                                        mp_drawing.DrawingSpec(color=(245,66,230), thickness=2, circle_radius=2) 
-                                        )  
-                _,buffer=cv2.imencode(".jpg",image1)
-                image1=buffer.tobytes()
-            yield(b' --frame\r\n'
-            b'Content-Type: image/jpeg\r\n\r\n'+image1+b'\r\n')
-            if cv2.waitKey(10) & 0xFF == ord('q'):
-                break
-    camera.release()
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows()  
     
+
+counter = 0
+   
 def detection():
+    
+    global state
+    global prevState
+    global counter
+    #////////////////////////time//////////////////////////////
+    
     time.sleep(2)
     cap = cv2.VideoCapture('./static/assets/Countdown5.mp4')
     while(cap.isOpened()):
@@ -117,56 +108,100 @@ def detection():
             break
     cap.release()
     cv2.destroyAllWindows()  
+    
+    # ////////////////////detection starts///////////////////////
+    very_begin = time.time()
+    
     labels = np.load('labels.npy')
     model = load_model('model.h5')
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     holis = mp.solutions.holistic
     hands = mp.solutions.hands
     drawing = mp.solutions.drawing_utils 
     holisO = holis.Holistic(static_image_mode=False)
     while True:
+        
+        prevState = state
+        
         x = []
         stime = time.time()
         ret, frame = cap.read()
-        frame = cv2.flip(frame, 1)
-        res = holisO.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-        drawing.draw_landmarks(frame, res.left_hand_landmarks, hands.HAND_CONNECTIONS)
-        drawing.draw_landmarks(frame, res.right_hand_landmarks, hands.HAND_CONNECTIONS)
-        # drawing.draw_landmarks(frame, res.face_landmarks, holis.FACEMESH_CONTOURS)
-        if res.face_landmarks:
-            if not(res.left_hand_landmarks):
-                for i in range(42):
-                    x.append(0.0)
-            else:
-                lox, loy = res.left_hand_landmarks.landmark[8].x, res.left_hand_landmarks.landmark[8].y
-                for i in res.left_hand_landmarks.landmark:
-                    x.append(i.x - lox)
-                    x.append(i.y - loy)
-            if not(res.right_hand_landmarks):
+        if ret == True:
+            frame = cv2.flip(frame, 1)
+            res = holisO.process(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+            drawing.draw_landmarks(frame, res.left_hand_landmarks, hands.HAND_CONNECTIONS)
+            drawing.draw_landmarks(frame, res.right_hand_landmarks, hands.HAND_CONNECTIONS)
+            # drawing.draw_landmarks(frame, res.face_landmarks, holis.FACEMESH_CONTOURS)
+            if res.face_landmarks:
+                if not(res.left_hand_landmarks):
+                    for i in range(42):
+                        x.append(0.0)
+                else:
+                    lox, loy = res.left_hand_landmarks.landmark[8].x, res.left_hand_landmarks.landmark[8].y
+                    for i in res.left_hand_landmarks.landmark:
+                        x.append(i.x - lox)
+                        x.append(i.y - loy)
+                if not(res.right_hand_landmarks):
+                    
+                    for i in range(42):
+                        x.append(0.0)
+                else:
+                    rox, roy = res.right_hand_landmarks.landmark[8].x, res.right_hand_landmarks.landmark[8].y
+                    for i in res.right_hand_landmarks.landmark:
+                        x.append(i.x - rox)
+                        x.append(i.y - roy)
+                for i in res.face_landmarks.landmark:
+                    x.append(i.x - res.face_landmarks.landmark[1].x)
+                    x.append(i.y - res.face_landmarks.landmark[1].y)
+                pred = model.predict(np.array([x]))
+                cv2.putText(frame, labels[np.argmax(pred)], (50,100), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,225,0), 7)
                 
-                for i in range(42):
-                    x.append(0.0)
-            else:
-                rox, roy = res.right_hand_landmarks.landmark[8].x, res.right_hand_landmarks.landmark[8].y
-                for i in res.right_hand_landmarks.landmark:
-                    x.append(i.x - rox)
-                    x.append(i.y - roy)
-            for i in res.face_landmarks.landmark:
-                x.append(i.x - res.face_landmarks.landmark[1].x)
-                x.append(i.y - res.face_landmarks.landmark[1].y)
-            pred = model.predict(np.array([x]))
-            cv2.putText(frame, labels[np.argmax(pred)], (50,100), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,225,0), 7)
+                state = str(labels[np.argmax(pred)])
+                list_State.append(state)
+                if(state == "screen" and prevState == "look away"):
+                    start()
+                elif(state == "look away" and prevState == "screen"):
+                    ending()
+                
+            etime = time.time()
+            cv2.putText(frame, f"{int(1/(etime-stime))}", (50,340), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             
-        etime = time.time()
-        cv2.putText(frame, f"{int(1/(etime-stime))}", (50,340), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
-        
-        _,buffer=cv2.imencode(".jpg",frame)
-        frame=buffer.tobytes()
-        yield(b' --frame\r\n'
-            b'Content-Type: image/jpeg\r\n\r\n'+frame+b'\r\n')
-        
-        
+            _,buffer=cv2.imencode(".jpg",frame)
+            frame=buffer.tobytes()
+            yield(b' --frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n'+frame+b'\r\n')
+            counter = counter+1
+            print(counter)
+            if counter > 250:
+                timing.pop(0)
+                print(timing)
+                time_look_away = sum(timing)
+                print("Amount of time looking away",time_look_away)
+                very_end_time=time.time()
+                
+                overall_timing = int(very_end_time-very_begin)
+                
+                print("over all session timing",overall_timing)
+                
+                productivity = ((overall_timing-time_look_away)/overall_timing)*100
+                print("time prductivity rating",productivity)
 
+                count_screen = list_State.count("screen")
+                count_look_away = list_State.count("look away")
+                
+                true_productivity = ((count_look_away/len(list_State))*100)
+                print("true productivity",true_productivity)
+                
+                best_predition = (true_productivity+productivity)/2
+                print("final productivity prediction", best_predition)
+                
+                plt.plot([x for x in range(0,len(list_State))],list_State)
+                plt.xlabel("time")
+                plt.ylabel("State")
+                plt.show()
+                plt.savefig('prductivity.png')
+                
+                break
 
 @app.route('/')
 def index():
