@@ -3,9 +3,9 @@ import os
 # 0-size
 import sys 
 
-from tensorflow.keras.models import Model 
-from tensorflow.keras.layers import Input, Dense
-from tensorflow.keras.utils import to_categorical
+from keras.models import Model 
+from keras.layers import Input, Dense
+from keras.utils import to_categorical
 
 def training():
 	data_size = 100

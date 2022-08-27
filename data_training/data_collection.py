@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 def data_collection():
-	cap = cv2.VideoCapture(1)
+	cap = cv2.VideoCapture(0)
 
 	data_name = input("Enter data name ! ")
 
