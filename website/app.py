@@ -24,6 +24,8 @@ state = "screen"
 prevState = "look away"
 begin = 0
 end = 0
+stateDisp = False
+dict_stats={}
 
 def start(): 
     global begin
@@ -170,47 +172,69 @@ def detection():
             frame=buffer.tobytes()
             yield(b' --frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n'+frame+b'\r\n')
-            counter = counter+1
-            print(counter)
-            if counter > 250:
-                timing.pop(0)
+            if stateDisp:
+
+                if len(timing):
+                    timing.pop(0)
                 print(timing)
                 time_look_away = sum(timing)
+                dict_stats['time_look_away'] = time_look_away
                 print("Amount of time looking away",time_look_away)
                 very_end_time=time.time()
-                
                 overall_timing = int(very_end_time-very_begin)
+                
+                dict_stats['overall_timing'] = overall_timing
                 
                 print("over all session timing",overall_timing)
                 
                 productivity = ((overall_timing-time_look_away)/overall_timing)*100
                 print("time prductivity rating",productivity)
 
-                count_screen = list_State.count("screen")
+                dict_stats['productivity'] = int(productivity)
+                
                 count_look_away = list_State.count("look away")
                 
                 true_productivity = ((count_look_away/len(list_State))*100)
                 print("true productivity",true_productivity)
                 
-                best_predition = (true_productivity+productivity)/2
-                print("final productivity prediction", best_predition)
+                dict_stats['true productivity'] = true_productivity
+                
+                best_prediction = (true_productivity+productivity)/2
+                print("final productivity prediction", best_prediction)
+                
+                dict_stats['best Prediction'] = int(best_prediction)
                 
                 plt.plot([x for x in range(0,len(list_State))],list_State)
                 plt.xlabel("time")
                 plt.ylabel("State")
-                plt.show()
-                plt.savefig('prductivity.png')
+                plt.savefig('./static/assets/productivity.png')
                 
+                print(dict_stats)
+                
+                cap.release()
+                cv2.destroyAllWindows()           
                 break
+            
+photos = os.path.join('static', 'assets')
+app.config['UPLOAD_FOLDER'] = photos
 
 @app.route('/')
 def index():
-    return render_template("base.html")
+    return render_template("book1.html")
 
 @app.route('/video')
 def video():
     return Response(detection(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/statsCall')
+def stats():
+    
+    global stateDisp
+    stateDisp = True
+    time.sleep(1)
+    stateDisp = False
+    full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'productivity.png')
+    return render_template("stats.html",user_image = full_filename, stats = dict_stats)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{%block title%}Book1{%endblock%}
+{%block head1%}
+<link rel="stylesheet" href="{{  url_for('static',filename='css/stats.css')  }}">
+<style>
+body{
+    background-image: url("{{url_for('static',filename='assets/stats_page.png')}}");
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+</style>
+
+
+{%endblock%}
+
+{%block body%}
+    <div class="main">
+        <div class="plot">
+            <img src="{{ user_image }}" alt="User Image">
+        </div>
+        <div class="stats">   
+            <div class="card"><div class = "title">Session Timing : </div> <div class="variable"> {{stats['overall_timing']}} </div> </h3></div>
+            <div class="card"><div class = "title">Distracted Timing : </div> <div class="variable">{{stats['time_look_away']}}</div></div>
+            <div class="card"><div class = "title">Productivity : </div> <div class="variable">{{stats['productivity']}}</div></div>
+            <div class="card"><div class = "title">Accuracy : </div> <div class="variable">{{stats['best Prediction']}}</div></div>
+        </div>
+    </div>
+{%endblock%}

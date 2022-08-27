@@ -1,9 +1,12 @@
 *{
     margin: 0;
     padding: 0;
-    background-color: #313639;
     overflow-x: hidden;
     overflow-y: hidden;
+}
+
+body{
+    background-color: #313639;
 }
 
 .Container{
@@ -43,7 +46,7 @@ button{
   outline:0; 
   font-size:1em;
   font-weight:600;
-  background:rgb(102, 102, 102);
+  background:#666666;
   border:none;
   border-radius: 5px;
   padding:1em 1em;
