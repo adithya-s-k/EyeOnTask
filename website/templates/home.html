@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{%block title%}Book1{%endblock%}
+{%block head1%}
+<style>
+    *{
+        margin:0;
+        padding:0;
+    }
+
+    body{
+        background-image: url("{{url_for('static',filename='assets/home.png')}}");
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+
+    .main{
+        background-color:transparent;
+        margin-top:200px;
+        margin-left:70px;
+        height:60vh;
+    }
+
+    .button_class{
+        background-color: trasparent;
+        height:220px;
+        width:300px;
+        margin:10px;
+        margin-top:20px;
+    }
+
+    .button {     
+        background-color: transparent;
+        background-repeat:no-repeat;
+        border: none;
+        cursor:pointer;
+        overflow: hidden;      
+    }
+
+    .butts{
+        display:flex;
+        margin-left:30px;
+    }
+</style>
+
+
+{%endblock%}
+
+{%block body%}
+    <div class="main">
+        <div class="butts">
+            <a href= 'book_1' ><div class="button_class"></div></a>
+            <a href= 'book_2' ><div class="button_class"></div></a>
+            <a href= 'book_3' ><div class="button_class"></div></a>
+        </div>
+    </div>
+{%endblock%}
