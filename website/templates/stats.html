@@ -9,12 +9,22 @@ body{
     background-repeat: no-repeat;
     background-size: 100%;
 }
+.home{
+    position:absolute;
+    background-color:transparent;
+    z-index:1000;
+    height:100px;
+    width:100%;
+    top:0px;
+    left:0px;
+  }
 </style>
 
 
 {%endblock%}
 
 {%block body%}
+    <a href="/"><div class="home"></div></a>
     <div class="main">
         <div class="plot">
             <img src="{{ user_image }}" alt="User Image">
@@ -23,7 +33,7 @@ body{
             <div class="card"><div class = "title">Session Timing : </div> <div class="variable"> {{stats['overall_timing']}} </div> </h3></div>
             <div class="card"><div class = "title">Distracted Timing : </div> <div class="variable">{{stats['time_look_away']}}</div></div>
             <div class="card"><div class = "title">Productivity : </div> <div class="variable">{{stats['productivity']}}</div></div>
-            <div class="card"><div class = "title">Accuracy : </div> <div class="variable">{{stats['best Prediction']}}</div></div>
+            <div class="card"><div class = "title">Precision Reading : </div> <div class="variable">{{stats['best Prediction']}}</div></div>
         </div>
     </div>
 {%endblock%}

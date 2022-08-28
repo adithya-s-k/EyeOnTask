@@ -14,7 +14,17 @@
         background-size: 100%;
     }
 
+    .home{
+      position:absolute;
+      background-color:transparent;
+      z-index:1000;
+      height:100px;
+      width:100%;
+      top:0px;
+      left:0px;
+    }
     .main{
+        position:absolute;
         background-color:transparent;
         margin-top:200px;
         margin-left:70px;
@@ -47,6 +57,7 @@
 {%endblock%}
 
 {%block body%}
+    <a href="/"><div class="home"></div></a>
     <div class="main">
         <div class="butts">
             <a href= 'book_1' ><div class="button_class"></div></a>
