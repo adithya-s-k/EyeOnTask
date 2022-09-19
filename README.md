@@ -1,7 +1,7 @@
 ## Hack4Soc
 This repo is for the [Hack4Soc](https://unstop.com/hackathon/hack4soc-where-technology-meets-humanity-rv-college-of-engineering-rvce-bangalore-405582) hackathon conducted by RV college of engineering.
 
-## Problem Statement
+## [Problem Statement](https://github.com/adithya-s-k/Hack4Soc/blob/master/Hack4soc%20problem%20statements%20(1).pdf)
 Humanity has various ongoing projects and programs, one among
 which is the Library project. This project envisages setting up a mini
 library in the premises of the shelter homes to inculcate the habit of
