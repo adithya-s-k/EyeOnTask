@@ -1,6 +1,23 @@
 ## Hack4Soc
 This repo is for the [Hack4Soc](https://unstop.com/hackathon/hack4soc-where-technology-meets-humanity-rv-college-of-engineering-rvce-bangalore-405582) hackathon conducted by RV college of engineering.
 
+## Problem Statment
+Many people struggle with staying focused and productive, leading to reduced efficiency and work quality. There is a need for a tool that can help individuals improve their focus and productivity.
+
+
+
+## Our Solution:
+An attention detector that tracks a person's eye movements in real-time using OpenCV and Mediapipe, and provides real-time feedback to the user to improve their focus and productivity.
+
+## Tech Stack
+- OpenCV
+- Mediapipe
+- Python
+- Keras | Tensorflow
+
+
+# For Hackathon Puroposes
+
 ## [Problem Statement](https://github.com/adithya-s-k/Hack4Soc/blob/master/Hack4soc%20problem%20statements%20(1).pdf)
 Humanity has various ongoing projects and programs, one among
 which is the Library project. This project envisages setting up a mini
@@ -34,5 +51,3 @@ submission.
 reading.
 - Set a next level target for completion of book (based on his
 previous level). 
-
-## Our Solution:
