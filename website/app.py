@@ -220,7 +220,7 @@ app.config['UPLOAD_FOLDER'] = photos
 
 @app.route('/')
 def index():
-    return render_template("home.html")
+    return render_template("book1.html")
 
 @app.route('/book_1')
 def book_1():
