@@ -1,0 +1,10 @@
+mediapipe
+keras
+tensorflow
+numpy
+opencv-python
+flask
+pycryptodome
+pyrebase4
+requests
+keyboard
